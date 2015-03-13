@@ -37,6 +37,7 @@ class CONSUMABLE(unknown) AttrTester1 {
   void callableWhen0()  CALLABLE_WHEN("unconsumed");
   void callableWhen1()  CALLABLE_WHEN(42); // expected-error {{'callable_when' attribute requires a string}}
   void callableWhen2()  CALLABLE_WHEN("foo"); // expected-warning {{'callable_when' attribute argument not supported: foo}}
+  void callableWhen3()  CALLABLE_WHEN(unconsumed);
   void consumes()       SET_TYPESTATE(consumed);
   bool testUnconsumed() TEST_TYPESTATE(consumed);
 };
@@ -53,3 +54,13 @@ class AttrTester2 {
 };
 
 class CONSUMABLE(42) AttrTester3; // expected-error {{'consumable' attribute requires an identifier}}
+
+
+class CONSUMABLE(unconsumed)
+      __attribute__((consumable_auto_cast_state))
+      __attribute__((consumable_set_state_on_read))
+      Status {
+};
+
+
+

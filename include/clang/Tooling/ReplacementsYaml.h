@@ -13,13 +13,13 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_CLANG_TOOLING_REPLACEMENTS_YAML_H
-#define LLVM_CLANG_TOOLING_REPLACEMENTS_YAML_H
+#ifndef LLVM_CLANG_TOOLING_REPLACEMENTSYAML_H
+#define LLVM_CLANG_TOOLING_REPLACEMENTSYAML_H
 
 #include "clang/Tooling/Refactoring.h"
 #include "llvm/Support/YAMLTraits.h"
-#include <vector>
 #include <string>
+#include <vector>
 
 LLVM_YAML_IS_SEQUENCE_VECTOR(clang::tooling::Replacement)
 
@@ -73,4 +73,4 @@ template <> struct MappingTraits<clang::tooling::TranslationUnitReplacements> {
 } // end namespace yaml
 } // end namespace llvm
 
-#endif // LLVM_CLANG_TOOLING_REPLACEMENTS_YAML_H
+#endif

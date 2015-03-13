@@ -7,6 +7,10 @@ static int f(int);
 int f(int);
 
 static void g(int);
-// expected-error@-1 {{declaration conflicts with target of using declaration already in scope}}
-// expected-note@Inputs/linkage-merge-foo.h:2 {{target of using declaration}}
-// expected-note@Inputs/linkage-merge-bar.h:3 {{using declaration}}
+// FIXME: Whether we notice the problem here depends on the order in which we
+// happen to find lookup results for 'g'; LookupResult::resolveKind needs to
+// be taught to prefer a visible result over a non-visible one.
+//
+// FIXME-error@-1 {{functions that differ only in their return type cannot be overloaded}}
+// FIXME-note@Inputs/linkage-merge-foo.h:2 {{previous declaration is here}}
+// expected-no-diagnostics

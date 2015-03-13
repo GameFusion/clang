@@ -21,10 +21,10 @@ struct A {
 A::A(struct Undeclared &ref) : mem(0) {}
 
 // Check that delegation works.
-// CHECK-LABEL: define void @_ZN1AC2ER10Undeclared(%struct.A* %this, %struct.Undeclared* %ref) unnamed_addr
+// CHECK-LABEL: define void @_ZN1AC2ER10Undeclared(%struct.A* %this, %struct.Undeclared* nonnull %ref) unnamed_addr
 // CHECK: call void @_ZN6MemberC1Ei(
 
-// CHECK-LABEL: define void @_ZN1AC1ER10Undeclared(%struct.A* %this, %struct.Undeclared* %ref) unnamed_addr
+// CHECK-LABEL: define void @_ZN1AC1ER10Undeclared(%struct.A* %this, %struct.Undeclared* nonnull %ref) unnamed_addr
 // CHECK: call void @_ZN1AC2ER10Undeclared(
 
 A::A(ValueClass v) : mem(v.y - v.x) {}
@@ -43,11 +43,11 @@ struct B : A {
 
 B::B(struct Undeclared &ref) : A(ref), mem(1) {}
 
-// CHECK-LABEL: define void @_ZN1BC2ER10Undeclared(%struct.B* %this, %struct.Undeclared* %ref) unnamed_addr
+// CHECK-LABEL: define void @_ZN1BC2ER10Undeclared(%struct.B* %this, %struct.Undeclared* nonnull %ref) unnamed_addr
 // CHECK: call void @_ZN1AC2ER10Undeclared(
 // CHECK: call void @_ZN6MemberC1Ei(
 
-// CHECK-LABEL: define void @_ZN1BC1ER10Undeclared(%struct.B* %this, %struct.Undeclared* %ref) unnamed_addr
+// CHECK-LABEL: define void @_ZN1BC1ER10Undeclared(%struct.B* %this, %struct.Undeclared* nonnull %ref) unnamed_addr
 // CHECK: call void @_ZN1BC2ER10Undeclared(
 
 
@@ -106,6 +106,6 @@ namespace test1 {
   struct B { B(); int x; A a[0]; };
   B::B() {}
   // CHECK-LABEL:    define void @_ZN5test11BC2Ev(
-  // CHECK:      [[THIS:%.*]] = load [[B:%.*]]**
+  // CHECK:      [[THIS:%.*]] = load [[B:%.*]]*, [[B:%.*]]**
   // CHECK-NEXT: ret void
 }

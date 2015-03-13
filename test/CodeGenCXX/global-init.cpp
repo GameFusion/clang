@@ -12,7 +12,7 @@ struct C { void *field; };
 
 struct D { ~D(); };
 
-// CHECK: @__dso_handle = external unnamed_addr global i8
+// CHECK: @__dso_handle = external global i8
 // CHECK: @c = global %struct.C zeroinitializer, align 8
 
 // It's okay if we ever implement the IR-generation optimization to remove this.
@@ -77,7 +77,7 @@ namespace test4 {
   extern int foo();
 
   // This needs an initialization function and guard variables.
-  // CHECK: load i8* bitcast (i64* @_ZGVN5test41xE
+  // CHECK: load i8, i8* bitcast (i64* @_ZGVN5test41xE
   // CHECK: [[CALL:%.*]] = call i32 @_ZN5test43fooEv
   // CHECK-NEXT: store i32 [[CALL]], i32* @_ZN5test41xE
   // CHECK-NEXT: store i64 1, i64* @_ZGVN5test41xE
@@ -187,19 +187,19 @@ namespace test7 {
 // At the end of the file, we check that y is initialized before z.
 
 // CHECK:      define internal void [[TEST1_Z_INIT:@.*]]()
-// CHECK:        load i32* @_ZN5test1L1yE
+// CHECK:        load i32, i32* @_ZN5test1L1yE
 // CHECK-NEXT:   xor
 // CHECK-NEXT:   store i32 {{.*}}, i32* @_ZN5test1L1zE
 // CHECK:      define internal void [[TEST1_Y_INIT:@.*]]()
-// CHECK:        load i32* @_ZN5test1L1xE
+// CHECK:        load i32, i32* @_ZN5test1L1xE
 // CHECK-NEXT:   sub
 // CHECK-NEXT:   store i32 {{.*}}, i32* @_ZN5test1L1yE
 
-// CHECK: define internal void @_GLOBAL__I_a() section "__TEXT,__StaticInit,regular,pure_instructions" {
+// CHECK: define internal void @_GLOBAL__sub_I_global_init.cpp() section "__TEXT,__StaticInit,regular,pure_instructions" {
 // CHECK:   call void [[TEST1_Y_INIT]]
 // CHECK:   call void [[TEST1_Z_INIT]]
 
 // rdar://problem/8090834: this should be nounwind
-// CHECK-NOEXC: define internal void @_GLOBAL__I_a() [[NUW:#[0-9]+]] section "__TEXT,__StaticInit,regular,pure_instructions" {
+// CHECK-NOEXC: define internal void @_GLOBAL__sub_I_global_init.cpp() [[NUW:#[0-9]+]] section "__TEXT,__StaticInit,regular,pure_instructions" {
 
 // CHECK-NOEXC: attributes [[NUW]] = { nounwind }

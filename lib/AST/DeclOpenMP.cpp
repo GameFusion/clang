@@ -12,8 +12,8 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/DeclBase.h"
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclOpenMP.h"
 #include "clang/AST/Expr.h"
 
@@ -40,7 +40,7 @@ OMPThreadPrivateDecl *OMPThreadPrivateDecl::CreateDeserialized(ASTContext &C,
                                                                unsigned ID,
                                                                unsigned N) {
   OMPThreadPrivateDecl *D = new (C, ID, N * sizeof(Expr *))
-      OMPThreadPrivateDecl(OMPThreadPrivate, 0, SourceLocation());
+      OMPThreadPrivateDecl(OMPThreadPrivate, nullptr, SourceLocation());
   D->NumVars = N;
   return D;
 }

@@ -403,7 +403,7 @@ namespace clang {
       typedef std::random_access_iterator_tag iterator_category;
       typedef int                 difference_type;
       
-      iterator() : Self(0), Position(0) { }
+      iterator() : Self(nullptr), Position(0) { }
       
       iterator(PreprocessingRecord *Self, int Position)
         : Self(Self), Position(Position) { }
@@ -518,23 +518,24 @@ namespace clang {
       return iterator(this, PreprocessedEntities.size());
     }
 
-    /// \brief begin/end iterator pair for the given range of loaded
+    /// \brief iterator range for the given range of loaded
     /// preprocessed entities.
-    std::pair<iterator, iterator>
-    getIteratorsForLoadedRange(unsigned start, unsigned count) {
+    llvm::iterator_range<iterator> getIteratorsForLoadedRange(unsigned start,
+                                                              unsigned count) {
       unsigned end = start + count;
       assert(end <= LoadedPreprocessedEntities.size());
-      return std::make_pair(
-                   iterator(this, int(start)-LoadedPreprocessedEntities.size()),
-                   iterator(this, int(end)-LoadedPreprocessedEntities.size()));
+      return llvm::make_range(
+          iterator(this, int(start) - LoadedPreprocessedEntities.size()),
+          iterator(this, int(end) - LoadedPreprocessedEntities.size()));
     }
 
-    /// \brief Returns a pair of [Begin, End) iterators of preprocessed entities
-    /// that source range \p R encompasses.
+    /// \brief Returns a range of preprocessed entities that source range \p R
+    /// encompasses.
     ///
     /// \param R the range to look for preprocessed entities.
     ///
-    std::pair<iterator, iterator> getPreprocessedEntitiesInRange(SourceRange R);
+    llvm::iterator_range<iterator>
+    getPreprocessedEntitiesInRange(SourceRange R);
 
     /// \brief Returns true if the preprocessed entity that \p PPEI iterator
     /// points to is coming from the file \p FID.
@@ -566,28 +567,25 @@ namespace clang {
     }
         
   private:
-    virtual void MacroExpands(const Token &Id, const MacroDirective *MD,
-                              SourceRange Range, const MacroArgs *Args);
-    virtual void MacroDefined(const Token &Id, const MacroDirective *MD);
-    virtual void MacroUndefined(const Token &Id, const MacroDirective *MD);
-    virtual void InclusionDirective(SourceLocation HashLoc,
-                                    const Token &IncludeTok,
-                                    StringRef FileName,
-                                    bool IsAngled,
-                                    CharSourceRange FilenameRange,
-                                    const FileEntry *File,
-                                    StringRef SearchPath,
-                                    StringRef RelativePath,
-                                    const Module *Imported);
-    virtual void Ifdef(SourceLocation Loc, const Token &MacroNameTok,
-                       const MacroDirective *MD);
-    virtual void Ifndef(SourceLocation Loc, const Token &MacroNameTok,
-                        const MacroDirective *MD);
+    void MacroExpands(const Token &Id, const MacroDirective *MD,
+                      SourceRange Range, const MacroArgs *Args) override;
+    void MacroDefined(const Token &Id, const MacroDirective *MD) override;
+    void MacroUndefined(const Token &Id, const MacroDirective *MD) override;
+    void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
+                            StringRef FileName, bool IsAngled,
+                            CharSourceRange FilenameRange,
+                            const FileEntry *File, StringRef SearchPath,
+                            StringRef RelativePath,
+                            const Module *Imported) override;
+    void Ifdef(SourceLocation Loc, const Token &MacroNameTok,
+               const MacroDirective *MD) override;
+    void Ifndef(SourceLocation Loc, const Token &MacroNameTok,
+                const MacroDirective *MD) override;
     /// \brief Hook called whenever the 'defined' operator is seen.
-    virtual void Defined(const Token &MacroNameTok, const MacroDirective *MD,
-                         SourceRange Range);
+    void Defined(const Token &MacroNameTok, const MacroDirective *MD,
+                 SourceRange Range) override;
 
-    virtual void SourceRangeSkipped(SourceRange Range);
+    void SourceRangeSkipped(SourceRange Range) override;
 
     void addMacroExpansion(const Token &Id, const MacroInfo *MI,
                            SourceRange Range);

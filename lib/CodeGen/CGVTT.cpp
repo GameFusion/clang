@@ -94,8 +94,11 @@ CodeGenVTables::EmitVTTDefinition(llvm::GlobalVariable *VTT,
   // Set the correct linkage.
   VTT->setLinkage(Linkage);
 
+  if (CGM.supportsCOMDAT() && VTT->isWeakForLinker())
+    VTT->setComdat(CGM.getModule().getOrInsertComdat(VTT->getName()));
+
   // Set the right visibility.
-  CGM.setTypeVisibility(VTT, RD, CodeGenModule::TVK_ForVTT);
+  CGM.setGlobalVisibility(VTT, RD);
 }
 
 llvm::GlobalVariable *CodeGenVTables::GetAddrOfVTT(const CXXRecordDecl *RD) {

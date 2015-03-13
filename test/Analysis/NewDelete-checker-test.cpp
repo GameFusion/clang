@@ -1,5 +1,5 @@
 // RUN: %clang_cc1 -analyze -analyzer-checker=core,cplusplus.NewDelete -std=c++11 -fblocks -verify %s
-// RUN: %clang_cc1 -analyze -analyzer-checker=core,alpha.cplusplus.NewDeleteLeaks -DLEAKS -std=c++11 -fblocks -verify %s
+// RUN: %clang_cc1 -analyze -analyzer-checker=core,cplusplus.NewDeleteLeaks -DLEAKS -std=c++11 -fblocks -verify %s
 #include "Inputs/system-header-simulator-cxx.h"
 
 typedef __typeof__(sizeof(int)) size_t;
@@ -142,11 +142,6 @@ void testUseThisAfterDelete() {
   SomeClass *c = new SomeClass;
   delete c;
   c->f(0); // expected-warning{{Use of memory after it is freed}}
-}
-
-void testDeleteAlloca() {
-  int *p = (int *)__builtin_alloca(sizeof(int));
-  delete p; // expected-warning{{Memory allocated by alloca() should not be deallocated}}
 }
 
 void testDoubleDelete() {
@@ -338,13 +333,13 @@ class DerefClass{
 public:
   int *x;
   DerefClass() {}
-  ~DerefClass() {*x = 1;} //expected-warning {{Use of memory after it is freed}}
+  ~DerefClass() {*x = 1;}
 };
 
 void testDoubleDeleteClassInstance() {
   DerefClass *foo = new DerefClass();
   delete foo;
-  delete foo; // FIXME: We should ideally report warning here instead of inside the destructor.
+  delete foo; // expected-warning {{Attempt to delete released memory}}
 }
 
 class EmptyClass{
@@ -356,5 +351,5 @@ public:
 void testDoubleDeleteEmptyClass() {
   EmptyClass *foo = new EmptyClass();
   delete foo;
-  delete foo;  //expected-warning {{Attempt to free released memory}}
+  delete foo;  // expected-warning {{Attempt to delete released memory}}
 }
